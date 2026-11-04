@@ -1,11 +1,17 @@
 use std::{io};
-use std::net::ToSocketAddrs;
+use std::net::{Ipv4Addr, ToSocketAddrs};
 use get_if_addrs::get_if_addrs;
 use std::net::TcpStream;
 use std::time::{Duration, Instant};
 use std::net::SocketAddr;
 fn main () {
-    
+    let addresses = vec![
+    String::from("192.168.1.1"),
+    String::from("google.com"),
+    String::from("8.8.8.8"),
+    String::from("256.256.256.256"),
+    String::from("1.1.1.1"),
+];
     loop {
         
         println!("================================");
@@ -14,6 +20,7 @@ fn main () {
         println!("1. Connection information");
         println!("2. Internet connectivity test");
         println!("3. DNS lookup");
+        println!("4. Test IPv4s");
         println!("0. Exit");
         println!("Select option: ");
         let mut input = String::new();
@@ -30,6 +37,7 @@ fn main () {
             1 => connection_info(),
             2 => connectivity_test(),
             3 => dns_lookup(),
+            4 => test_ipv4s(&addresses),
             0 => {
                 println!("Goodbye!");
                 break;
@@ -112,4 +120,29 @@ fn dns_lookup() {
             println!("DNS lookup failed: {}", error)
         }
     }
+}
+fn find_first_ipv4(addresses: &Vec<String>) -> Option<String> {
+    for addr in addresses {
+        if addr.parse::<Ipv4Addr>().is_ok() {
+            return Some(addr.to_string());
+        }
+    }
+    None
+}
+fn find_all_ipv4(addresses: &Vec<String>) -> Vec<String> {
+    let mut ipv4_addresses: Vec<String> = vec![];
+    for addr in addresses {
+        if addr.parse::<Ipv4Addr>().is_ok() {
+        ipv4_addresses.push(addr.to_string());
+        }
+    };
+    ipv4_addresses
+}
+
+fn test_ipv4s(addresses: &Vec<String>) {
+    let first_ipv4 = find_first_ipv4(addresses);
+    let ipv4s = find_all_ipv4(addresses);
+    println!("{first_ipv4:#?}");
+    println!("{ipv4s:#?}");
+    println!("{}", ipv4s.len());
 }
