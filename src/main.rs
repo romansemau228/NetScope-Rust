@@ -5,7 +5,7 @@ use std::time::{Duration, Instant};
 use std::net::SocketAddr;
 use network_interface::{NetworkInterface, NetworkInterfaceConfig};
 fn main () {
-    let addresses = vec![
+    let mut addresses = vec![
     String::from("192.168.1.1"),
     String::from("google.com"),
     String::from("8.8.8.8"),
@@ -21,6 +21,8 @@ fn main () {
         println!("2. Internet connectivity test");
         println!("3. DNS lookup");
         println!("4. Test IPv4s");
+        println!("5. Add IP4v");
+        println!("6. Remove IP4v");
         println!("0. Exit");
         println!("Select option: ");
         let mut input = String::new();
@@ -38,6 +40,8 @@ fn main () {
             2 => connectivity_test(),
             3 => dns_lookup(),
             4 => test_ipv4s(&addresses),
+            5 => add_ipv4(&mut addresses),
+            6 => remove_ipv4(&mut addresses),
             0 => {
                 println!("Goodbye!");
                 break;
@@ -153,3 +157,41 @@ fn test_ipv4s(addresses: &Vec<String>) {
     println!("All IPv4 addresses: {ipv4s:#?}");
     println!("Total IPv4 addresses: {}", ipv4s.len());
 }
+fn add_ipv4(addresses: &mut Vec<String>) {
+    println!("Enter IPv4_address.");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Failed to read input");
+    if input.parse::<Ipv4Addr>().is_ok() {
+        if addresses.contains(&input.to_string()) {
+            println!("This address already exists!");
+            return;
+        }
+        else {
+        addresses.push(input.to_string());
+        }
+    }
+    else {
+        println!("Invalid IPv4 address!")
+    }
+}
+fn remove_ipv4(addresses: &mut Vec<String>) {
+    println!("Enter IPv4_address.");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input).expect("Failed to read input");
+    let input = input.trim();
+        if input.parse::<Ipv4Addr>().is_err() {
+        println!("Invalid IPv4");
+        }
+        else {
+        let index = addresses.iter().position(|addr| addr == input);
+        match index {
+            Some(index) => {
+                let removed = addresses.remove(index);
+                println!("Removed: {removed}");
+            }
+            None => {
+                println!("IPv4 address not found!");
+            }
+        }
+        }
+    }
