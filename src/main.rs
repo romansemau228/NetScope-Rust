@@ -15,14 +15,14 @@ fn main () {
     loop {
         
         println!("================================");
-        println!("         NetScope v0.1");
+        println!("         NetScope v0.2");
         println!("================================");
         println!("1. Connection information");
         println!("2. Internet connectivity test");
         println!("3. DNS lookup");
         println!("4. Test IPv4s");
-        println!("5. Add IP4v");
-        println!("6. Remove IP4v");
+        println!("5. Add IPv4");
+        println!("6. Remove IPv4");
         println!("0. Exit");
         println!("Select option: ");
         let mut input = String::new();
@@ -128,7 +128,7 @@ fn dns_lookup() {
         }
     }
 }
-fn find_first_ipv4(addresses: &Vec<String>) -> Option<String> {
+fn find_first_ipv4(addresses: &[String]) -> Option<String> {
     for addr in addresses {
         if addr.parse::<Ipv4Addr>().is_ok() {
             return Some(addr.to_string());
@@ -136,7 +136,7 @@ fn find_first_ipv4(addresses: &Vec<String>) -> Option<String> {
     }
     None
 }
-fn find_all_ipv4(addresses: &Vec<String>) -> Vec<String> {
+fn find_all_ipv4(addresses: &[String]) -> Vec<String> {
     let mut ipv4_addresses: Vec<String> = vec![];
     for addr in addresses {
         if addr.parse::<Ipv4Addr>().is_ok() {
@@ -146,7 +146,7 @@ fn find_all_ipv4(addresses: &Vec<String>) -> Vec<String> {
     ipv4_addresses
 }
 
-fn test_ipv4s(addresses: &Vec<String>) {
+fn test_ipv4s(addresses: &[String]) {
     let first_ipv4 = find_first_ipv4(addresses);
     match first_ipv4 {
         Some(ip) => println!("First IPv4: {}", ip),
@@ -161,6 +161,7 @@ fn add_ipv4(addresses: &mut Vec<String>) {
     println!("Enter IPv4_address.");
     let mut input = String::new();
     io::stdin().read_line(&mut input).expect("Failed to read input");
+    let input = input.trim();
     if input.parse::<Ipv4Addr>().is_ok() {
         if addresses.contains(&input.to_string()) {
             println!("This address already exists!");
