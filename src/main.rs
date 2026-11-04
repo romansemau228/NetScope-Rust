@@ -1,9 +1,9 @@
 use std::{io};
 use std::net::{Ipv4Addr, ToSocketAddrs};
-use get_if_addrs::get_if_addrs;
 use std::net::TcpStream;
 use std::time::{Duration, Instant};
 use std::net::SocketAddr;
+use network_interface::{NetworkInterface, NetworkInterfaceConfig};
 fn main () {
     let addresses = vec![
     String::from("192.168.1.1"),
@@ -48,7 +48,7 @@ fn main () {
 }
 
 fn connection_info() {
-    let interfaces = match get_if_addrs() {
+    let interfaces = match NetworkInterface::show() {
         Ok(interfaces) => interfaces,
         Err(error) => {
             println!("Failed to get interfaces: {error}");
@@ -57,16 +57,19 @@ fn connection_info() {
     };
     let mut counter = 0;
     for interface in interfaces {
+        for addr in interface.addr {
         counter += 1;
-        let ip_type: &str = if interface.ip().is_ipv4() {
+        let ip_type: &str = if addr.ip().is_ipv4() {
             "IPv4"
         }
         else {
             "IPv6"
         };
         println!("{counter}. Interface: {}", interface.name);
-        println!("IP: {}", interface.ip());
+        println!("IP: {}", addr.ip());
         println!("Type: {}", ip_type);
+        println!("---");
+    }
     }
 }
 fn connectivity_test() {
@@ -141,8 +144,12 @@ fn find_all_ipv4(addresses: &Vec<String>) -> Vec<String> {
 
 fn test_ipv4s(addresses: &Vec<String>) {
     let first_ipv4 = find_first_ipv4(addresses);
+    match first_ipv4 {
+        Some(ip) => println!("First IPv4: {}", ip),
+        None => println!("No IPv4 addresses found"),
+
+    }
     let ipv4s = find_all_ipv4(addresses);
-    println!("{first_ipv4:#?}");
-    println!("{ipv4s:#?}");
-    println!("{}", ipv4s.len());
+    println!("All IPv4 addresses: {ipv4s:#?}");
+    println!("Total IPv4 addresses: {}", ipv4s.len());
 }
